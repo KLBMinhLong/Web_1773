@@ -1,0 +1,145 @@
+@model Web_1773.Models.Product
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<div class="container py-4">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="row g-0">
+                <!-- Product Images Section -->
+                <div class="col-lg-6">
+                    <div class="product-gallery p-4">
+                        <!-- Main Product Image -->
+                        <div class="main-image-container mb-3">
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <img src="@Model.ImageUrl" class="img-fluid main-product-image rounded" 
+                                     alt="@Model.Name" 
+                                     onerror="this.src='/images/product-placeholder.jpg'">
+                            }
+                            else
+                            {
+                                <img src="/images/product-placeholder.jpg" class="img-fluid main-product-image rounded" 
+                                     alt="Product placeholder">
+                            }
+                        </div>
+
+                        <!-- Additional Images Gallery -->
+                        @if (Model.ImageUrls != null && Model.ImageUrls.Any())
+                        {
+                            <div class="additional-images">
+                                <h6 class="text-muted mb-2">Ảnh bổ sung</h6>
+                                <div class="row g-2">
+                                    @foreach (var imageUrl in Model.ImageUrls)
+                                    {
+                                        <div class="col-3">
+                                            <div class="thumbnail-container">
+                                                <img src="@imageUrl" class="img-thumbnail additional-image" 
+                                                     alt="Additional product image"
+                                                     onerror="this.src='/images/product-placeholder.jpg'">
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                
+                <!-- Product Details Section -->
+                <div class="col-lg-6">
+                    <div class="product-details p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h2 class="display-6 fw-bold mb-1">@Model.Name</h2>
+                            <span class="badge bg-primary rounded-pill">@Model.Category?.Name</span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <span class="product-price display-6 text-primary fw-bold">
+                                @String.Format("{0:N0} ₫", Model.Price)
+                            </span>
+                        </div>
+                        
+                        <div class="product-description mb-4">
+                            <h5>Mô tả sản phẩm</h5>
+                            <hr>
+                            <p>@Model.Description</p>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                            <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-warning btn-lg px-4 me-md-2">
+                                <i class="fas fa-edit me-2"></i> Chỉnh sửa
+                            </a>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
+                                <i class="fas fa-arrow-left me-2"></i> Quay lại
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-gallery {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+    }
+    
+    .main-image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 400px;
+        background-color: #fff;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .main-product-image {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+    }
+    
+    .thumbnail-container {
+        height: 80px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #fff;
+        border-radius: 0.25rem;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .thumbnail-container:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .additional-image {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+    }
+    
+    .product-price {
+        color: #007bff;
+    }
+    
+    @@media (max-width: 992px) {
+        .main-image-container {
+            height: 300px;
+        }
+    }
+    
+    @@media (max-width: 576px) {
+        .main-image-container {
+            height: 250px;
+        }
+    }
+</style>

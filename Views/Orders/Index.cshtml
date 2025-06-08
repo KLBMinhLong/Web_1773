@@ -1,0 +1,92 @@
+@model IEnumerable<Web_1773.Models.Order>
+@{
+    ViewData["Title"] = "Lịch sử đơn hàng";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="d-sm-flex align-items-center justify-content-between">
+                <h1 class="h3 mb-0 text-primary">
+                    <i class="fas fa-history me-2"></i>Lịch sử đơn hàng
+                </h1>
+                <a href="/" class="btn btn-outline-primary mt-3 mt-sm-0">
+                    <i class="fas fa-shopping-bag me-2"></i>Tiếp tục mua sắm
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-shopping-basket fa-4x text-muted mb-4"></i>
+                        <h4>Bạn chưa có đơn hàng nào</h4>
+                        <p class="text-muted mb-4">Bắt đầu mua sắm ngay để trải nghiệm các sản phẩm tuyệt vời của chúng tôi</p>
+                        <a href="/" class="btn btn-primary">
+                            <i class="fas fa-shopping-cart me-2"></i>Mua sắm ngay
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Mã đơn hàng</th>
+                                        <th>Ngày đặt</th>
+                                        <th>Số sản phẩm</th>
+                                        <th class="text-end">Tổng tiền</th>
+                                        <th class="text-end">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <span class="fw-bold">#@order.Id</span>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-column">
+                                                    <span>@order.OrderDate.ToString("dd/MM/yyyy")</span>
+                                                    <small class="text-muted">@order.OrderDate.ToString("HH:mm")</small>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var itemCount = order.OrderDetails?.Count ?? 0;
+                                                    var totalItems = order.OrderDetails?.Sum(od => od.Quantity) ?? 0;
+                                                }
+                                                <span class="badge bg-info rounded-pill">@totalItems sản phẩm</span>
+                                            </td>
+                                            <td class="text-end fw-bold">
+                                                @(String.Format("{0:N0} ₫", order.TotalPrice))
+                                            </td>
+                                            <td class="text-end">
+                                                <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye me-1"></i>Chi tiết
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

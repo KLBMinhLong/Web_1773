@@ -1,0 +1,68 @@
+﻿@{
+    ViewData["Title"] = "Privacy Policy";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Admin" asp-action="Index" class="text-decoration-none admin-link">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Privacy Policy</li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-0 text-gradient fw-bold">@ViewData["Title"]</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 text-primary fw-bold">
+                        <i class="fas fa-shield-alt me-2"></i>Chính sách bảo mật thông tin
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <h5 class="fw-bold">1. Mục đích thu thập thông tin</h5>
+                        <p>Hệ thống quản trị thu thập thông tin người dùng nhằm:</p>
+                        <ul>
+                            <li>Quản lý tài khoản và xác thực người dùng</li>
+                            <li>Cải thiện trải nghiệm người dùng trên hệ thống</li>
+                            <li>Gửi thông báo về các tính năng mới, cập nhật hệ thống</li>
+                            <li>Phục vụ việc thống kê và đánh giá hiệu quả quản lý</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="fw-bold">2. Phạm vi sử dụng thông tin</h5>
+                        <p>Thông tin người dùng được sử dụng trong phạm vi hệ thống quản trị nội bộ. Chúng tôi cam kết không chia sẻ, bán hoặc cho thuê thông tin cá nhân của bạn cho bên thứ ba mà không có sự đồng ý.</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="fw-bold">3. Thời gian lưu trữ thông tin</h5>
+                        <p>Thông tin người dùng sẽ được lưu trữ trong hệ thống cho đến khi có yêu cầu hủy bỏ từ người dùng hoặc khi tài khoản không còn hoạt động trong một thời gian dài theo quy định của chúng tôi.</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="fw-bold">4. Bảo mật thông tin</h5>
+                        <p>Chúng tôi cam kết bảo mật thông tin cá nhân của người dùng bằng các biện pháp:</p>
+                        <ul>
+                            <li>Sử dụng công nghệ mã hóa dữ liệu</li>
+                            <li>Hạn chế quyền truy cập vào thông tin cá nhân</li>
+                            <li>Thường xuyên cập nhật các biện pháp bảo mật</li>
+                            <li>Kiểm tra và đánh giá hệ thống bảo mật định kỳ</li>
+                        </ul>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-primary {
+        color: #ffffff !important;
+    }
+</style>

@@ -1,0 +1,169 @@
+@model Web_1773.Models.Product
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Thêm sản phẩm mới";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Admin" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Product" asp-action="Index" class="text-decoration-none">Sản phẩm</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Thêm sản phẩm</li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-0 text-gradient fw-bold">Thêm sản phẩm mới</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 text-primary fw-bold">
+                        <i class="fas fa-plus-circle me-2"></i>Thông tin sản phẩm
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Add" method="post" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- Thông tin cơ bản -->
+                                <div class="mb-4">
+                                    <label asp-for="Name" class="form-label fw-medium">Tên sản phẩm</label>
+                                    <input asp-for="Name" class="form-control form-control-lg rounded-3" placeholder="Nhập tên sản phẩm" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="Price" class="form-label fw-medium">Giá sản phẩm</label>
+                                    <div class="input-group">
+                                        <input asp-for="Price" class="form-control form-control-lg rounded-start" placeholder="0" />
+                                        <span class="input-group-text rounded-end">VNĐ</span>
+                                    </div>
+                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="CategoryId" class="form-label fw-medium">Danh mục</label>
+                                    <select asp-for="CategoryId" class="form-select form-select-lg" asp-items="ViewBag.Categories">
+                                        <option value="">-- Chọn danh mục --</option>
+                                    </select>
+                                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <!-- Hình ảnh -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-medium">Ảnh đại diện</label>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text"><i class="fas fa-image"></i></span>
+                                        <input type="file" name="mainImage" class="form-control form-control-lg" accept="image/*" />
+                                    </div>
+                                    <small class="text-muted">Chọn một ảnh đại diện cho sản phẩm</small>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-medium">Ảnh bổ sung</label>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text"><i class="fas fa-images"></i></span>
+                                        <input type="file" name="additionalImages" multiple class="form-control form-control-lg" accept="image/*" />
+                                    </div>
+                                    <small class="text-muted">Có thể chọn nhiều ảnh (nhấn giữ CTRL để chọn)</small>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mb-4">
+                                <label asp-for="Description" class="form-label fw-medium">Mô tả sản phẩm</label>
+                                <textarea asp-for="Description" class="form-control" rows="5" placeholder="Nhập mô tả chi tiết về sản phẩm..."></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between border-top pt-4 mt-2">
+                            <a asp-action="Index" class="btn btn-secondary px-4 py-2">
+                                <i class="fas fa-arrow-left me-2"></i>Hủy và quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 py-2">
+                                <i class="fas fa-save me-2"></i>Lưu sản phẩm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Gradient heading */
+    .text-gradient {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Form controls styling */
+    .form-control, .form-select, .input-group-text {
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
+    }
+
+    /* Button styling */
+    .btn-primary {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #5a6ecd, #6a4291);
+        border: none;
+    }
+
+    .text-primary {
+        color: #667eea !important;
+    }
+
+    /* Card styling */
+    .card {
+        position: relative;
+        border: none;
+    }
+
+    .card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, #667eea, #764ba2);
+        border-radius: 4px 0 0 4px;
+    }
+
+    .card-header {
+        border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    }
+</style>
+
+@section Scripts {
+    <script>
+        // Image preview functionality could be added here
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add any client-side validation or enhancements here
+        });
+    </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

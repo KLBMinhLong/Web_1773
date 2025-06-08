@@ -1,0 +1,184 @@
+@model Web_1773.Models.ShoppingCart
+@{
+    ViewData["Title"] = "Giỏ hàng";
+}
+
+<div class="container py-4">
+    <h1 class="mb-4">
+        <i class="fas fa-shopping-cart me-2"></i>Giỏ hàng của bạn
+    </h1>
+
+    @if (Model.Items.Any())
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Sản phẩm</th>
+                                        <th class="text-center">Đơn giá</th>
+                                        <th class="text-center">Số lượng</th>
+                                        <th class="text-center">Thành tiền</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Items)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                                    {
+                                                        <img src="@item.ImageUrl" alt="@item.Name" class="cart-item-image me-3" 
+                                                             onerror="this.src='/images/product-placeholder.jpg'">
+                                                    }
+                                                    else
+                                                    {
+                                                        <img src="/images/product-placeholder.jpg" alt="Product image" class="cart-item-image me-3">
+                                                    }
+                                                    <div>
+                                                        <h6 class="mb-0">@item.Name</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">@(String.Format("{0:N0} ₫", item.Price))</td>
+                                            <td class="text-center">
+                                                <form asp-action="UpdateCart" method="post" class="d-inline">
+                                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                                    <div class="input-group quantity-control">
+                                                        <button type="button" class="btn btn-outline-secondary btn-sm quantity-btn" 
+                                                                onclick="decrementQuantity(@item.ProductId)">
+                                                            <i class="fas fa-minus"></i>
+                                                        </button>
+                                                        <input type="number" name="quantity" id="quantity-@item.ProductId" value="@item.Quantity" 
+                                                               min="1" class="form-control text-center quantity-input" 
+                                                               onchange="updateCart(@item.ProductId)">
+                                                        <button type="button" class="btn btn-outline-secondary btn-sm quantity-btn" 
+                                                                onclick="incrementQuantity(@item.ProductId)">
+                                                            <i class="fas fa-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </td>
+                                            <td class="text-center fw-bold">@(String.Format("{0:N0} ₫", item.Total))</td>
+                                            <td class="text-end">
+                                                <a asp-action="RemoveFromCart" asp-route-productId="@item.ProductId" 
+                                                   class="btn btn-outline-danger btn-sm">
+                                                    <i class="fas fa-trash me-1"></i>Xóa
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <a href="/" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-1"></i>Tiếp tục mua sắm
+                    </a>
+                    <a asp-action="ClearCart" class="btn btn-outline-danger">
+                        <i class="fas fa-trash me-1"></i>Xóa giỏ hàng
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 mt-4 mt-lg-0">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Tổng giỏ hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Tổng tiền hàng:</span>
+                            <span class="fw-bold">@(String.Format("{0:N0} ₫", Model.TotalAmount))</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Phí vận chuyển:</span>
+                            <span class="fw-bold text-success">Miễn phí</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Tổng thanh toán:</span>
+                            <span class="fw-bold fs-5 text-primary">@(String.Format("{0:N0} ₫", Model.TotalAmount))</span>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a asp-action="Checkout" class="btn btn-primary">
+                                <i class="bi bi-credit-card me-2"></i>Tiến hành đặt hàng
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+            <h4>Giỏ hàng của bạn đang trống</h4>
+            <p class="text-muted">Hãy thêm sản phẩm vào giỏ hàng để tiếp tục.</p>
+            <a href="/" class="btn btn-primary mt-3">
+                <i class="fas fa-shopping-bag me-2"></i>Tiếp tục mua sắm
+            </a>
+        </div>
+    }
+
+</div>
+
+<style>
+    .cart-item-image {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        border: 1px solid #eee;
+        border-radius: 4px;
+    }
+    
+    .quantity-control {
+        width: 120px;
+    }
+    
+    .quantity-input {
+        max-width: 50px;
+        height: 30px;
+        padding: 0;
+    }
+    
+    .quantity-btn {
+        padding: 0.2rem 0.5rem;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function updateCart(productId) {
+            const quantityInput = document.getElementById(`quantity-${productId}`);
+            const quantity = parseInt(quantityInput.value);
+            
+            if (quantity >= 1) {
+                window.location.href = `/ShoppingCart/UpdateCart?productId=${productId}&quantity=${quantity}`;
+            }
+        }
+        
+        function incrementQuantity(productId) {
+            const quantityInput = document.getElementById(`quantity-${productId}`);
+            quantityInput.value = parseInt(quantityInput.value) + 1;
+            updateCart(productId);
+        }
+        
+        function decrementQuantity(productId) {
+            const quantityInput = document.getElementById(`quantity-${productId}`);
+            const currentValue = parseInt(quantityInput.value);
+            
+            if (currentValue > 1) {
+                quantityInput.value = currentValue - 1;
+                updateCart(productId);
+            }
+        }
+    </script>
+}

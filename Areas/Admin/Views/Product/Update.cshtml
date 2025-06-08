@@ -1,0 +1,214 @@
+@model Web_1773.Models.Product
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Cập nhật sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Admin" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Product" asp-action="Index" class="text-decoration-none">Sản phẩm</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Cập nhật sản phẩm</li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-0 text-gradient fw-bold">Cập nhật sản phẩm</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 text-primary fw-bold">
+                        <i class="fas fa-edit me-2"></i>Chỉnh sửa thông tin sản phẩm
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Update" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="row">
+                            <div class="col-md-7">
+                                <!-- Thông tin cơ bản -->
+                                <div class="mb-4">
+                                    <label asp-for="Name" class="form-label fw-medium">Tên sản phẩm</label>
+                                    <input asp-for="Name" class="form-control form-control-lg rounded-3" placeholder="Nhập tên sản phẩm" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="Price" class="form-label fw-medium">Giá sản phẩm</label>
+                                    <div class="input-group">
+                                        <input asp-for="Price" class="form-control form-control-lg rounded-start" placeholder="0" />
+                                        <span class="input-group-text rounded-end">VNĐ</span>
+                                    </div>
+                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="CategoryId" class="form-label fw-medium">Danh mục</label>
+                                    <select asp-for="CategoryId" class="form-select form-select-lg" asp-items="ViewBag.Categories">
+                                        <option value="">-- Chọn danh mục --</option>
+                                    </select>
+                                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="Description" class="form-label fw-medium">Mô tả sản phẩm</label>
+                                    <textarea asp-for="Description" class="form-control" rows="5" placeholder="Nhập mô tả chi tiết về sản phẩm..."></textarea>
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-5">
+                                <!-- Hình ảnh hiện tại -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-medium">Hình ảnh hiện tại</label>
+                                    <div class="card bg-light border p-2 mb-3">
+                                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                        {
+                                            <div class="text-center">
+                                                <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded product-preview mb-2" style="max-height: 200px; object-fit: contain;" />
+                                            </div>
+                                            <div class="small text-muted text-center text-truncate">@Model.ImageUrl</div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-center py-5">
+                                                <i class="fas fa-image fa-4x text-muted mb-3"></i>
+                                                <p>Chưa có hình ảnh</p>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Cập nhật hình ảnh mới -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-medium">Thay đổi hình ảnh</label>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text"><i class="fas fa-image"></i></span>
+                                        <input type="file" name="ImageFile" class="form-control form-control-lg" accept="image/*" />
+                                    </div>
+                                    <small class="text-muted">Chọn một hình ảnh mới để thay thế hình ảnh hiện tại</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between border-top pt-4 mt-2">
+                            <a asp-action="Index" class="btn btn-secondary px-4 py-2">
+                                <i class="fas fa-arrow-left me-2"></i>Hủy và quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 py-2">
+                                <i class="fas fa-save me-2"></i>Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Gradient heading */
+    .text-gradient {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Form controls styling */
+    .form-control, .form-select, .input-group-text {
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
+    }
+
+    /* Button styling */
+    .btn-primary {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #5a6ecd, #6a4291);
+        border: none;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+        border: none;
+    }
+
+    .text-primary {
+        color: #667eea !important;
+    }
+
+    /* Card styling */
+    .card {
+        position: relative;
+        border: none;
+    }
+
+    .card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, #667eea, #764ba2);
+        border-radius: 4px 0 0 4px;
+    }
+
+    .card-header {
+        border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    }
+
+    /* Product image preview */
+    .product-preview {
+        transition: all 0.3s ease;
+    }
+
+    .product-preview:hover {
+        transform: scale(1.05);
+    }
+</style>
+
+@section Scripts {
+    <script>
+        // Image preview functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.querySelector('input[name="ImageFile"]');
+            const imagePreview = document.querySelector('.product-preview');
+            
+            if (imageInput && imagePreview) {
+                imageInput.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            imagePreview.src = e.target.result;
+                        };
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+            }
+        });
+    </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

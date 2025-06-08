@@ -1,0 +1,124 @@
+@using Microsoft.AspNetCore.Identity
+@using Web_1773.Helpers
+@model Web_1773.Models.Order
+@{
+    ViewData["Title"] = "Thanh toán";
+    var cart = Context.Session.GetObjectFromJson<ShoppingCart>("Cart") ?? new ShoppingCart();
+    var user = await UserManager.GetUserAsync(User);
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Thông tin đặt hàng</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Checkout" method="post">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+
+                        <!-- Thêm các trường ẩn để đảm bảo không thiếu thông tin -->
+                        <input type="hidden" asp-for="UserId" value="@user?.Id" />
+                        <input type="hidden" asp-for="TotalPrice" value="@cart.TotalAmount" />
+                        <input type="hidden" asp-for="OrderDate" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")" />
+                        
+                        <!-- Thêm OrderDetails dưới dạng ẩn -->
+                        @for (int i = 0; i < cart.Items.Count; i++)
+                        {
+                            <input type="hidden" name="OrderDetails[@i].ProductId" value="@cart.Items[i].ProductId" />
+                            <input type="hidden" name="OrderDetails[@i].Quantity" value="@cart.Items[i].Quantity" />
+                            <input type="hidden" name="OrderDetails[@i].Price" value="@cart.Items[i].Price" />
+                        }
+
+                        <div class="mb-4">
+                            <h5>Thông tin giao hàng</h5>
+                            <hr />
+                            <div class="mb-3">
+                                <label asp-for="ShippingAddress" class="form-label">Địa chỉ giao hàng</label>
+                                <textarea asp-for="ShippingAddress" class="form-control" rows="3" required></textarea>
+                                <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Notes" class="form-label">Ghi chú</label>
+                                <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Ghi chú về đơn hàng, ví dụ: thời gian giao hàng hoặc địa chỉ giao hàng chi tiết."></textarea>
+                                <span asp-validation-for="Notes" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5>Tóm tắt đơn hàng</h5>
+                            <hr />
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Sản phẩm</th>
+                                            <th class="text-center">Số lượng</th>
+                                            <th class="text-end">Giá</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in cart.Items)
+                                        {
+                                            <tr>
+                                                <td>@item.Name</td>
+                                                <td class="text-center">@item.Quantity</td>
+                                                <td class="text-end">@(String.Format("{0:N0} ₫", item.Total))</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="2">Tổng tiền hàng</th>
+                                            <th class="text-end">@(String.Format("{0:N0} ₫", cart.TotalAmount))</th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="2">Phí vận chuyển</th>
+                                            <td class="text-end text-success">Miễn phí</td>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="2">Tổng thanh toán</th>
+                                            <th class="text-end text-primary fs-5">@(String.Format("{0:N0} ₫", cart.TotalAmount))</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Quay lại giỏ hàng
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check2-circle me-2"></i>Đặt hàng
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Kiểm tra form submit
+        $(document).ready(function() {
+            $('form').on('submit', function(e) {
+                console.log('Form submitting...');
+                
+                // Thêm validation client-side
+                if ($('#ShippingAddress').val().trim() === '') {
+                    alert('Vui lòng nhập địa chỉ giao hàng');
+                    e.preventDefault();
+                    return false;
+                }
+                
+                console.log('Form validation succeeded');
+            });
+        });
+    </script>
+}

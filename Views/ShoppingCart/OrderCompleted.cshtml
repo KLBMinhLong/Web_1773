@@ -1,0 +1,317 @@
+@model Web_1773.Models.Order
+@{
+    ViewData["Title"] = "Đặt hàng thành công";
+    var orderDate = Model.OrderDate.ToString("dd/MM/yyyy HH:mm");
+    var orderItems = Model.OrderDetails?.Count ?? 0;
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Thông báo thành công -->
+            <div class="card border-success shadow-sm mb-4">
+                <div class="card-body text-center py-5 success-animation">
+                    <div class="success-checkmark">
+                        <div class="check-icon">
+                            <span class="icon-line line-tip"></span>
+                            <span class="icon-line line-long"></span>
+                            <div class="icon-circle"></div>
+                            <div class="icon-fix"></div>
+                        </div>
+                    </div>
+                    <h2 class="mb-3 fw-bold text-success">Đặt hàng thành công!</h2>
+                    <p class="lead">Cảm ơn bạn đã mua hàng tại ElectroShop</p>
+                    <div class="order-id-badge my-3">
+                        <span>Mã đơn hàng</span>
+                        <h5 class="mb-0 fw-bold text-primary">#@Model.Id</h5>
+                    </div>
+                    <p class="text-muted">
+                        Chúng tôi đã gửi email xác nhận đến địa chỉ đăng ký của bạn.
+                        Đơn hàng sẽ được xử lý và giao trong thời gian sớm nhất.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Chi tiết đơn hàng -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Chi tiết đơn hàng</h5>
+                        <span class="badge bg-primary rounded-pill">@orderItems sản phẩm</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4 g-4">
+                        <div class="col-md-6">
+                            <div class="order-info-card">
+                                <h6 class="text-uppercase text-muted mb-3"><i class="bi bi-calendar-check me-2"></i>Thông tin đặt hàng</h6>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Mã đơn hàng:</span>
+                                    <span class="fw-bold">#@Model.Id</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Ngày đặt:</span>
+                                    <span class="fw-bold">@orderDate</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Trạng thái:</span>
+                                    <span class="badge bg-success">Đã xác nhận</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="order-address-card">
+                                <h6 class="text-uppercase text-muted mb-3"><i class="bi bi-geo-alt me-2"></i>Địa chỉ giao hàng</h6>
+                                <div class="shipping-address p-3 border rounded bg-light">
+                                    <p class="mb-0">@Model.ShippingAddress</p>
+                                </div>
+                                
+                                @if (!string.IsNullOrEmpty(Model.Notes))
+                                {
+                                    <h6 class="text-uppercase text-muted mt-3 mb-2"><i class="bi bi-chat-left-text me-2"></i>Ghi chú</h6>
+                                    <div class="notes p-3 border rounded bg-light fst-italic">
+                                        <p class="mb-0">@Model.Notes</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chi tiết sản phẩm -->
+                    <h6 class="text-uppercase text-muted mb-3"><i class="bi bi-box-seam me-2"></i>Sản phẩm đã đặt</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Sản phẩm</th>
+                                    <th scope="col" class="text-center">Đơn giá</th>
+                                    <th scope="col" class="text-center">Số lượng</th>
+                                    <th scope="col" class="text-end">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.OrderDetails != null && Model.OrderDetails.Any())
+                                {
+                                    @foreach (var item in Model.OrderDetails)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (item.Product != null)
+                                                {
+                                                    @item.Product.Name
+                                                }
+                                                else
+                                                {
+                                                    <span>Sản phẩm #@item.ProductId</span>
+                                                }
+                                            </td>
+                                            <td class="text-center">@(String.Format("{0:N0} ₫", item.Price))</td>
+                                            <td class="text-center">@item.Quantity</td>
+                                            <td class="text-end">@(String.Format("{0:N0} ₫", item.Quantity * item.Price))</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-3">
+                                            <div class="text-muted">Không có thông tin chi tiết đơn hàng</div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="3" class="text-end fw-bold">Tổng tiền:</td>
+                                    <td class="text-end fw-bold text-primary">@(String.Format("{0:N0} ₫", Model.TotalPrice))</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="/" class="btn btn-primary">
+                            <i class="bi bi-house me-2"></i>Trở về trang chủ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSS cho animation và giao diện -->
+<style>
+    /* Animation dấu tích */
+    .success-animation {
+        position: relative;
+    }
+    
+    .success-checkmark {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+    }
+    
+    .success-checkmark .check-icon {
+        width: 80px;
+        height: 80px;
+        position: relative;
+        border-radius: 50%;
+        box-sizing: content-box;
+        border: 4px solid #4CAF50;
+    }
+    
+    .success-checkmark .check-icon::before {
+        top: 3px;
+        left: -2px;
+        width: 30px;
+        transform-origin: 100% 50%;
+        border-radius: 100px 0 0 100px;
+    }
+    
+    .success-checkmark .check-icon::after {
+        top: 0;
+        left: 30px;
+        width: 60px;
+        transform-origin: 0 50%;
+        border-radius: 0 100px 100px 0;
+        animation: rotate-circle 4.25s ease-in;
+    }
+    
+    .success-checkmark .check-icon::before, .success-checkmark .check-icon::after {
+        content: '';
+        height: 100px;
+        position: absolute;
+        background: #FFFFFF;
+        transform: rotate(-45deg);
+    }
+    
+    .success-checkmark .check-icon .icon-line {
+        height: 5px;
+        background-color: #4CAF50;
+        display: block;
+        border-radius: 2px;
+        position: absolute;
+        z-index: 10;
+    }
+    
+    .success-checkmark .check-icon .icon-line.line-tip {
+        top: 46px;
+        left: 14px;
+        width: 25px;
+        transform: rotate(45deg);
+        animation: icon-line-tip 0.75s;
+    }
+    
+    .success-checkmark .check-icon .icon-line.line-long {
+        top: 38px;
+        right: 8px;
+        width: 47px;
+        transform: rotate(-45deg);
+        animation: icon-line-long 0.75s;
+    }
+    
+    .success-checkmark .check-icon .icon-circle {
+        top: -4px;
+        left: -4px;
+        z-index: 10;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        position: absolute;
+        box-sizing: content-box;
+        border: 4px solid rgba(76, 175, 80, .5);
+    }
+    
+    .success-checkmark .check-icon .icon-fix {
+        top: 8px;
+        width: 5px;
+        left: 26px;
+        z-index: 1;
+        height: 85px;
+        position: absolute;
+        transform: rotate(-45deg);
+        background-color: #FFFFFF;
+    }
+
+    /* Thẻ hiển thị mã đơn hàng */
+    .order-id-badge {
+        display: inline-block;
+        padding: 8px 20px;
+        border-radius: 30px;
+        background-color: #f8f9fa;
+        border: 2px dashed #dee2e6;
+    }
+    
+    /* Card thông tin đơn hàng */
+    .order-info-card,
+    .order-address-card {
+        height: 100%;
+        padding: 15px;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+    }
+    
+    /* Timeline giao hàng */
+    .timeline {
+        position: relative;
+        padding: 20px 0 20px;
+        list-style: none;
+    }
+    
+    .timeline:before {
+        content: " ";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 18px;
+        width: 3px;
+        margin-left: -1.5px;
+        background-color: #eeeeee;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+        padding-left: 50px;
+    }
+    
+    .timeline-badge {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        background-color: #e9ecef;
+        border-radius: 50%;
+        font-size: 1.2rem;
+        color: #6c757d;
+    }
+    
+    .timeline-item.active .timeline-badge {
+        background-color: #4CAF50;
+        color: white;
+    }
+    
+    /* Card styles */
+    .card {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        border-bottom: none;
+        padding: 15px 20px;
+    }
+    
+    .table {
+        margin-bottom: 0;
+    }
+   
+</style>

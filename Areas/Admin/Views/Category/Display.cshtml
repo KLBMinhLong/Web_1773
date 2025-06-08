@@ -1,0 +1,35 @@
+@model Web_1773.Models.Category
+
+@{
+    ViewData["Title"] = "Category Details";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<h2>Category Details</h2>
+
+<div>
+    <h3>@Model.Name</h3>
+
+    @if (Model.Products != null && Model.Products.Any())
+    {
+        <h4>Products in this Category:</h4>
+        <ul>
+            @foreach (var product in Model.Products)
+            {
+                <li>
+                    <a asp-controller="Product" asp-action="Display" asp-route-id="@product.Id">
+                        @product.Name
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No products in this category.</p>
+    }
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a> |
+    <a asp-action="Update" asp-route-id="@Model.Id">Edit</a>
+</div>

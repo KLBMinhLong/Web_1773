@@ -1,0 +1,169 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Đăng Ký";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h3 class="mb-0 fw-bold">@ViewData["Title"]</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        <div class="text-center mb-4">
+                            <h5>Tạo tài khoản mới</h5>
+                            <p class="text-muted small">Vui lòng điền đầy đủ thông tin bên dưới</p>
+                        </div>
+                        
+                        <div asp-validation-summary="ModelOnly" class="text-danger rounded p-2" role="alert"></div>
+                        
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                            <label asp-for="Input.Email"><i class="bi bi-envelope me-1"></i>Email</label>
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Input.Password" class="form-label"><i class="bi bi-lock me-1"></i>Mật khẩu</label>
+                            <div class="password-wrapper">
+                                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Nhập mật khẩu" id="password-input" />
+                                <button type="button" id="toggle-password" tabindex="-1">
+                                    <span id="password-icon" class="bi bi-eye-slash"></span>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            <div class="form-text small">Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường và số.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label asp-for="Input.ConfirmPassword" class="form-label"><i class="bi bi-lock-fill me-1"></i>Xác nhận mật khẩu</label>
+                            <div class="password-wrapper">
+                                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Nhập lại mật khẩu" id="confirm-password-input" />
+                                <button type="button" id="toggle-confirm-password" tabindex="-1">
+                                    <span id="confirm-password-icon" class="bi bi-eye-slash"></span>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="d-grid mb-3">
+                            <button id="registerSubmit" type="submit" class="btn btn-primary btn-lg py-2 fw-bold">
+                                <i class="bi bi-person-plus-fill me-2"></i>Đăng ký ngay
+                            </button>
+                        </div>
+                        
+                        <div class="text-center">
+                            <p class="mb-0">Bạn đã có tài khoản? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-primary fw-bold">Đăng nhập</a></p>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center py-3 bg-light">
+                    <div class="small">
+                        <p class="mb-0">Hoặc đăng ký bằng</p>
+                        <div class="mt-2">
+                            @{
+                                if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                                {
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button class="btn btn-outline-secondary disabled">
+                                            <i class="bi bi-google me-1"></i>Google
+                                        </button>
+                                        <button class="btn btn-outline-secondary disabled">
+                                            <i class="bi bi-facebook me-1"></i>Facebook
+                                        </button>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="text-muted small">Đăng nhập bằng mạng xã hội hiện không khả dụng</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            @foreach (var provider in Model.ExternalLogins!)
+                                            {
+                                                <button type="submit" class="btn btn-outline-primary" name="provider" value="@provider.Name" title="Đăng ký bằng tài khoản @provider.DisplayName">
+                                                    <i class="bi bi-@(provider.DisplayName.ToLower()) me-1"></i>@provider.DisplayName
+                                                </button>
+                                            }
+                                        </div>
+                                    </form>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Cải tiến nút hiển thị mật khẩu */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 40px;
+}
+
+.password-wrapper button {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #6c757d;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.password-wrapper button:hover {
+    color: #495057;
+}
+
+.password-wrapper button:focus {
+    outline: none;
+}
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Hiển thị mật khẩu khi cần
+        $(document).ready(function () {
+            // Chức năng hiển thị/ẩn mật khẩu
+            $("#toggle-password").click(function(e) {
+                e.preventDefault();
+                var passwordInput = $("#password-input");
+                var passwordIcon = $("#password-icon");
+                
+                const type = passwordInput.attr("type") === "password" ? "text" : "password";
+                passwordInput.attr("type", type);
+                passwordIcon.attr("class", type === "password" ? "bi bi-eye-slash" : "bi bi-eye");
+            });
+            
+            // Chức năng hiển thị/ẩn xác nhận mật khẩu
+            $("#toggle-confirm-password").click(function(e) {
+                e.preventDefault();
+                var confirmPasswordInput = $("#confirm-password-input");
+                var confirmPasswordIcon = $("#confirm-password-icon");
+                
+                const type = confirmPasswordInput.attr("type") === "password" ? "text" : "password";
+                confirmPasswordInput.attr("type", type);
+                confirmPasswordIcon.attr("class", type === "password" ? "bi bi-eye-slash" : "bi bi-eye");
+            });
+        });
+    </script>
+}

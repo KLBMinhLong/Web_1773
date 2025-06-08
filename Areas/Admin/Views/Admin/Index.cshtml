@@ -1,0 +1,435 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <h1 class="mb-4 text-gradient fw-bold">Dashboard quản trị</h1>
+    
+    <div class="row">
+        <!-- Summary Cards -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-primary text-uppercase mb-1">
+                                Sản phẩm</div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">@(ViewBag.ProductCount ?? 0)</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-box fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="text-primary">
+                        Xem chi tiết <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-success text-uppercase mb-1">
+                                Danh mục</div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">@(ViewBag.CategoryCount ?? 0)</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-folder fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="text-success">
+                        Xem chi tiết <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-info text-uppercase mb-1">
+                                Người dùng</div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">@(ViewBag.UserCount ?? 0)</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="text-info">
+                        Xem chi tiết <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-warning text-uppercase mb-1">
+                                Đơn hàng</div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">@(ViewBag.OrderCount ?? 0)</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="text-warning">
+                        Xem chi tiết <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 fw-bold text-white">Thao tác nhanh</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <!-- 1. Sửa đường dẫn nút Thêm sản phẩm mới -->
+                            <a asp-area="Admin" asp-controller="Product" asp-action="Add" class="btn btn-primary d-block">
+                                <i class="fas fa-plus me-1"></i> Thêm sản phẩm mới
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <!-- 2. Sửa đường dẫn nút Thêm danh mục mới -->
+                            <a asp-area="Admin" asp-controller="Category" asp-action="Add" class="btn btn-success d-block">
+                                <i class="fas fa-plus me-1"></i> Thêm danh mục mới
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a asp-area="Admin" asp-controller="Users" asp-action="Create" class="btn btn-info d-block">
+                                <i class="fas fa-user-plus me-1"></i> Thêm người dùng
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <!-- 3. Sửa đường dẫn nút Xem báo cáo -->
+                            <a asp-area="Admin" asp-controller="Admin" asp-action="Reports" class="btn btn-secondary d-block">
+                                <i class="fas fa-chart-bar me-1"></i> Xem báo cáo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Products -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 fw-bold text-white">Sản phẩm mới nhất</h6>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.RecentProducts != null && ViewBag.RecentProducts.Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Tên sản phẩm</th>
+                                        <th>Giá</th>
+                                        <th>Danh mục</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in ViewBag.RecentProducts)
+                                    {
+                                        <tr>
+                                            <td>@product.Name</td>
+                                            <td>@product.Price.ToString("N0") đ</td>
+                                            <td>@product.Category.Name</td>
+                                            <td>
+                                                <!-- 4. Sửa đường dẫn Edit sản phẩm -->
+                                                <a asp-area="Admin" asp-controller="Product" asp-action="Update" asp-route-id="@product.Id" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="mb-0">Chưa có sản phẩm nào.</p>
+                    }
+                </div>
+                <div class="card-footer">
+                    <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-sm btn-primary">
+                        Xem tất cả sản phẩm
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Categories -->
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 fw-bold text-white">Danh mục mới nhất</h6>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.RecentCategories != null && ViewBag.RecentCategories.Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Tên danh mục</th>
+                                        <th>Số sản phẩm</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var category in ViewBag.RecentCategories)
+                                    {
+                                        <tr>
+                                            <td>@category.Name</td>
+                                            <td>@(category.ProductCount ?? 0)</td>
+                                            <td>
+                                                <!-- 5. Sửa đường dẫn Edit danh mục -->
+                                                <a asp-area="Admin" asp-controller="Category" asp-action="Update" asp-route-id="@category.Id" class="btn btn-sm btn-success">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="mb-0">Chưa có danh mục nào.</p>
+                    }
+                </div>
+                <div class="card-footer">
+                    <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="btn btn-sm btn-success">
+                        Xem tất cả danh mục
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 fw-bold text-white">Đơn hàng gần đây</h6>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.RecentOrders != null && ViewBag.RecentOrders.Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Mã đơn</th>
+                                        <th>Khách hàng</th>
+                                        <th>Ngày đặt</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in ViewBag.RecentOrders)
+                                    {
+                                        <tr>
+                                            <td>#@order.Id</td>
+                                            <td>@order.User?.Email</td>
+                                            <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>@order.TotalPrice.ToString("N0") đ</td>
+                                            <td>
+                                                <a asp-area="Admin" asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="mb-0">Chưa có đơn hàng nào.</p>
+                    }
+                </div>
+                <div class="card-footer">
+                    <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="btn btn-sm btn-warning">
+                        Xem tất cả đơn hàng
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Tiêu đề trang */
+    .text-gradient {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Card header gradient */
+    .card-header {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        color: #fff !important;
+        border-radius: 0.5rem 0.5rem 0 0;
+        font-weight: 600;
+        font-size: 1.1rem;
+        border: none;
+    }
+
+    /* Card shadow and border */
+    .card {
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 24px rgba(80, 80, 180, 0.08);
+        border: none;
+        overflow: hidden;
+    }
+
+    /* Left colored border for stats cards */
+    .border-left-primary {
+        border-left: 4px solid #667eea;
+    }
+
+    .border-left-success {
+        border-left: 4px solid #38ef7d;
+    }
+
+    .border-left-info {
+        border-left: 4px solid #00f2fe;
+    }
+
+    .border-left-warning {
+        border-left: 4px solid #ffb347;
+    }
+
+    /* Table header gradient */
+    .table thead th {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        padding: 12px 15px;
+    }
+
+    /* Table row hover */
+    .table tbody tr:hover {
+        background: #f3f6fa;
+    }
+
+    /* Action buttons */
+    .btn-primary, .btn-success, .btn-info, .btn-secondary, .btn-warning {
+        border: none;
+        border-radius: 2rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .btn-success {
+        background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .btn-info {
+        background: linear-gradient(90deg, #0575e6 0%, #00f2fe 100%);
+    }
+
+    .btn-warning {
+        background: linear-gradient(90deg, #f6d365 0%, #ffb347 100%);
+        color: #333;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(90deg, #757f9a 0%, #d7dde8 100%);
+        color: #333;
+    }
+
+    .btn-primary:hover, .btn-success:hover, .btn-info:hover, .btn-warning:hover, .btn-secondary:hover {
+        opacity: 0.85;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Edit icon button in table */
+    .table .btn-sm {
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        font-size: 1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .table .btn-sm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Card footer styling */
+    .card-footer {
+        background-color: #f8f9fc;
+        border-top: 1px solid #eaecf4;
+        padding: 1rem;
+    }
+
+    .card-footer a {
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .card-footer a:hover {
+        text-decoration: none;
+        opacity: 0.8;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .card-header, .card-header.py-3 {
+            font-size: 1rem;
+        }
+        .d-block {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>

@@ -1,0 +1,89 @@
+﻿@{
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout !=  null)
+    {
+        Layout = parentLayout.ToString();
+    }
+    else
+    {
+        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
+    }
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary-gradient text-white py-3">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-user-cog me-2"></i>Quản lý tài khoản
+                    </h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <partial name="_ManageNav" />
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}
+
+<style>
+    /* Gradient colors */
+    .bg-primary-gradient {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+    }
+    
+    /* Account management sidebar */
+    .list-group-item {
+        border: none;
+        border-left: 3px solid transparent;
+        padding: 1rem 1.25rem;
+        transition: all 0.2s ease;
+    }
+    
+    .list-group-item.active {
+        background-color: #f8f9fa;
+        color: #667eea;
+        border-left: 3px solid #667eea;
+        font-weight: 600;
+    }
+    
+    .list-group-item:hover:not(.active) {
+        background-color: #f8f9fa;
+        border-left: 3px solid #e9ecef;
+    }
+    
+    /* Form controls */
+    .form-control, .form-select {
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
+    }
+    
+    /* Button styling */
+    .btn-primary {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border: none;
+        transition: all 0.3s;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #5a6ecd, #6a4291);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+</style>

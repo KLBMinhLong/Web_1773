@@ -1,0 +1,347 @@
+@model Web_1773.Models.Order
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng #" + Model.Id;
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var orderDate = Model.OrderDate.ToString("dd/MM/yyyy HH:mm");
+}
+
+<div class="container-fluid py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="text-decoration-none">Đơn hàng</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Chi tiết đơn hàng #@Model.Id</li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-0 text-primary fw-bold">Chi tiết đơn hàng #@Model.Id</h1>
+        </div>
+        <div class="mt-3 mt-sm-0">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Quay lại
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger ms-2">
+                <i class="fas fa-trash me-1"></i> Xóa đơn hàng
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <!-- Chi tiết đơn hàng -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 text-primary fw-bold">
+                        <i class="fas fa-info-circle me-2"></i>Thông tin đơn hàng
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <h6 class="fw-bold text-muted mb-3">
+                                <i class="fas fa-clipboard-list me-2"></i>Thông tin chung
+                            </h6>
+                            <div class="table-responsive">
+                                <table class="table table-borderless table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row" class="text-muted">Mã đơn hàng:</th>
+                                            <td class="fw-bold">#@Model.Id</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="text-muted">Ngày đặt:</th>
+                                            <td>@orderDate</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="text-muted">Tổng tiền:</th>
+                                            <td class="text-primary fw-bold">@String.Format("{0:N0} ₫", Model.TotalPrice)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <h6 class="fw-bold text-muted mb-3">
+                                <i class="fas fa-user me-2"></i>Thông tin người mua
+                            </h6>
+                            <div class="table-responsive">
+                                <table class="table table-borderless table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row" class="text-muted">Email:</th>
+                                            <td>@Model.User?.Email</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="text-muted">User ID:</th>
+                                            <td><small class="text-muted">@Model.UserId</small></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-3">
+
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-muted mb-3">
+                            <i class="fas fa-map-marker-alt me-2"></i>Địa chỉ giao hàng
+                        </h6>
+                        <div class="p-3 bg-light rounded-3 border">@Model.ShippingAddress</div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-muted mb-3">
+                                <i class="fas fa-sticky-note me-2"></i>Ghi chú
+                            </h6>
+                            <div class="p-3 bg-light rounded-3 border fst-italic">@Model.Notes</div>
+                        </div>
+                    }
+
+                    <div>
+                        <h6 class="fw-bold text-muted mb-3">
+                            <i class="fas fa-box-open me-2"></i>Chi tiết sản phẩm
+                        </h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover border">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="py-2">Sản phẩm</th>
+                                        <th class="py-2 text-end">Đơn giá</th>
+                                        <th class="py-2 text-center">Số lượng</th>
+                                        <th class="py-2 text-end">Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.OrderDetails != null && Model.OrderDetails.Any())
+                                    {
+                                        foreach (var item in Model.OrderDetails)
+                                        {
+                                            <tr>
+                                                <td class="py-3">
+                                                    <div class="d-flex align-items-center">
+                                                        @if (item.Product != null && !string.IsNullOrEmpty(item.Product.ImageUrl))
+                                                        {
+                                                            <img src="@item.Product.ImageUrl" class="me-3 rounded" 
+                                                                style="width: 50px; height: 50px; object-fit: contain;" 
+                                                                alt="@item.Product.Name">
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="bg-light border rounded me-3 d-flex align-items-center justify-content-center"
+                                                                style="width: 50px; height: 50px;">
+                                                                <i class="fas fa-box text-muted"></i>
+                                                            </div>
+                                                        }
+                                                        <div>
+                                                            <div class="fw-medium">@(item.Product?.Name ?? $"Sản phẩm #{item.ProductId}")</div>
+                                                            @if (item.Product?.Category != null)
+                                                            {
+                                                                <small class="text-muted">@item.Product.Category.Name</small>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 text-end">@String.Format("{0:N0} ₫", item.Price)</td>
+                                                <td class="py-3 text-center">
+                                                    <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
+                                                        @item.Quantity
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 text-end fw-bold">@String.Format("{0:N0} ₫", item.Price * item.Quantity)</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4 text-muted">Không có dữ liệu chi tiết đơn hàng</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-end fw-bold">Tổng tiền:</td>
+                                        <td class="fw-bold text-primary text-end">@String.Format("{0:N0} ₫", Model.TotalPrice)</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Thông tin đơn hàng -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="mailto:@Model.User?.Email" class="btn btn-outline-primary">
+                            <i class="fas fa-envelope me-2"></i> Liên hệ với khách hàng
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Màu sắc chủ đạo sử dụng gradient */
+    .text-primary {
+        color: #667eea !important;
+    }
+    
+    h1.text-primary {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .card-header h5.text-primary {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    /* Đường viền gradient cho cards */
+    .card {
+        position: relative;
+        border: none;
+    }
+    
+    .card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 3px 0 0 3px;
+    }
+    
+    /* Nút với gradient */
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #5a6ecd 0%, #6a4291 100%);
+    }
+    
+    .btn-outline-primary {
+        color: #667eea;
+        border-color: #667eea;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: #667eea;
+        color: white;
+    }
+    
+    /* Bảng sản phẩm */
+    .table thead {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        color: #667eea;
+        border: none;
+    }
+    
+    .table th {
+        font-weight: 600;
+        border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+    }
+    
+    .table td {
+        vertical-align: middle;
+        border-bottom: 1px solid #f5f5f5;
+    }
+    
+    .table tfoot {
+        background: rgba(102, 126, 234, 0.05);
+    }
+    
+    .table tfoot td {
+        border-top: 1px solid rgba(102, 126, 234, 0.2);
+    }
+    
+    /* Hiệu ứng hover dòng */
+    .table-hover tbody tr {
+        transition: all 0.2s ease;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(102, 126, 234, 0.05);
+    }
+    
+    /* Giá và số lượng */
+    .text-end.fw-bold.text-primary {
+        color: #667eea !important;
+    }
+    
+    .badge {
+        background-color: rgba(102, 126, 234, 0.15);
+        color: #667eea;
+    }
+    
+    /* Breadcrumb và tiêu đề */
+    .breadcrumb-item a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .breadcrumb-item a:hover {
+        color: #764ba2;
+    }
+    
+    .breadcrumb-item.active {
+        color: #764ba2;
+    }
+    
+    /* Các thẻ và containers */
+    .bg-light {
+        background-color: rgba(102, 126, 234, 0.05) !important;
+    }
+    
+    .border {
+        border-color: rgba(102, 126, 234, 0.2) !important;
+    }
+    
+    /* Cards info */
+    .card-header {
+        border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    }
+    
+    .text-muted {
+        color: #6c757d !important;
+    }
+    
+    /* Hiệu ứng đặc biệt */
+    .bg-success-light {
+        background-color: rgba(40, 167, 69, 0.15);
+    }
+    
+    .text-success {
+        color: #28a745 !important;
+    }
+    
+    /* Icons */
+    .fas.fa-info-circle,
+    .fas.fa-clipboard-list,
+    .fas.fa-user,
+    .fas.fa-map-marker-alt,
+    .fas.fa-sticky-note,
+    .fas.fa-box-open,
+    .fas.fa-shopping-bag,
+    .fas.fa-envelope {
+        color: #667eea;
+    }
+    
+</style>
+

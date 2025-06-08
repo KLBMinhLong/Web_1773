@@ -1,0 +1,190 @@
+@model Web_1773.Models.Order
+@{
+    ViewData["Title"] = "Xóa đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="text-decoration-none admin-link">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="text-decoration-none admin-link">Đơn hàng</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Xóa đơn hàng</li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-0 text-gradient fw-bold">Xóa đơn hàng #@Model.Id</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card border-0 shadow-sm rounded-3 mb-4 warning-card">
+                <div class="card-header py-3 bg-danger-soft">
+                    <h5 class="mb-0 text-danger fw-bold">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Xác nhận xóa đơn hàng
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="delete-icon-container mb-4">
+                            <i class="fas fa-exclamation-triangle fa-4x text-danger"></i>
+                        </div>
+                        <h4 class="fw-bold">Bạn có chắc muốn xóa đơn hàng này?</h4>
+                        <p class="text-muted">
+                            Hành động này sẽ xóa vĩnh viễn đơn hàng và tất cả chi tiết đơn hàng liên quan.
+                            <br>Không thể hoàn tác sau khi xóa.
+                        </p>
+                    </div>
+
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-light" style="width: 40%">Mã đơn hàng</th>
+                                    <td class="fw-bold">#@Model.Id</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">Ngày đặt hàng</th>
+                                    <td>@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">Khách hàng</th>
+                                    <td>@Model.User?.Email</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">Tổng tiền</th>
+                                    <td class="fw-bold text-order-price">@String.Format("{0:N0} ₫", Model.TotalPrice)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-cancel">
+                                <i class="fas fa-arrow-left me-2"></i> Hủy và quay lại
+                            </a>
+                            <button type="submit" class="btn btn-delete">
+                                <i class="fas fa-trash me-2"></i> Xác nhận xóa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Tiêu đề với gradient */
+    .text-gradient {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    /* Links trong breadcrumb */
+    .admin-link {
+        color: #667eea;
+    }
+    
+    .admin-link:hover {
+        color: #764ba2;
+        text-decoration: underline !important;
+    }
+    
+    /* Card xóa đơn hàng */
+    .warning-card {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .warning-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background-color: #dc3545;
+        border-radius: 3px 0 0 3px;
+    }
+    
+    /* Header card */
+    .bg-danger-soft {
+        background-color: rgba(220, 53, 69, 0.1);
+        border-bottom: 1px solid rgba(220, 53, 69, 0.2);
+    }
+    
+    /* Icon cảnh báo */
+    .delete-icon-container {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background-color: rgba(220, 53, 69, 0.1);
+        margin-bottom: 1rem;
+    }
+    
+    /* Bảng thông tin */
+    .table {
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e9ecef;
+    }
+    
+    .table th {
+        font-weight: 600;
+        background-color: rgba(108, 117, 125, 0.05) !important;
+    }
+    
+    .table th, .table td {
+        padding: 12px 15px;
+        border-color: #e9ecef;
+        vertical-align: middle;
+    }
+    
+    /* Giá tiền */
+    .text-order-price {
+        color: #667eea;
+    }
+    
+    /* Nút hủy */
+    .btn-cancel {
+        background-color: #6c757d;
+        color: white;
+        border-radius: 4px;
+        padding: 8px 16px;
+        transition: all 0.3s;
+        border: none;
+    }
+    
+    .btn-cancel:hover {
+        background-color: #5a6268;
+        color: white;
+    }
+    
+    /* Nút xóa */
+    .btn-delete {
+        background: linear-gradient(45deg, #ff5858, #da4453);
+        color: white;
+        border-radius: 4px;
+        padding: 8px 16px;
+        transition: all 0.3s;
+        border: none;
+        box-shadow: 0 2px 5px rgba(220, 53, 69, 0.2);
+    }
+    
+    .btn-delete:hover {
+        background: linear-gradient(45deg, #ff4040, #c42a39);
+        color: white;
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    }
+</style>

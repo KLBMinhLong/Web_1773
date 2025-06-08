@@ -1,0 +1,136 @@
+@model Web_1773.Models.Category
+
+@{
+    ViewData["Title"] = "Thêm danh mục mới";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Admin" asp-action="Index" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Category" asp-action="Index" class="text-decoration-none">Danh mục</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Thêm danh mục</li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-0 text-gradient fw-bold">Thêm danh mục mới</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 text-primary fw-bold">
+                        <i class="fas fa-folder-plus me-2 text-white"></i>Thông tin danh mục
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Add" method="post">
+                        <div class="mb-4">
+                            <label asp-for="Name" class="form-label fw-medium">Tên danh mục</label>
+                            <input asp-for="Name" class="form-control form-control-lg" placeholder="Nhập tên danh mục..." />
+                            <span asp-validation-for="Name" class="text-danger mt-1"></span>
+                            <div class="form-text mt-2">
+                                <i class="fas fa-info-circle me-1 text-primary"></i>
+                                Tên danh mục nên ngắn gọn và dễ hiểu
+                            </div>
+                        </div>
+
+                       
+
+                        <div class="d-flex justify-content-between border-top pt-4 mt-2">
+                            <a asp-action="Index" class="btn btn-secondary px-4 py-2">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 py-2">
+                                <i class="fas fa-save me-2"></i>Thêm danh mục
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+<style>
+    /* Gradient heading */
+    .text-gradient {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Form controls styling */
+    .form-control, .form-select {
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
+    }
+
+    /* Button styling */
+    .btn-primary {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border: none;
+        transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #5a6ecd, #6a4291);
+        border: none;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        border: none;
+        transition: all 0.3s;
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+        border: none;
+    }
+
+    .text-primary {
+        color: #ffffff !important;
+    }
+
+    /* Card styling */
+    .card {
+        position: relative;
+        border: none;
+    }
+
+    .card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, #667eea, #764ba2);
+        border-radius: 4px 0 0 4px;
+    }
+
+    .card-header {
+        border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    }
+    
+    /* Radio button styling */
+    .form-check-input:checked {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+</style>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

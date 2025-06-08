@@ -1,0 +1,26 @@
+@inject SignInManager<IdentityUser> SignInManager
+@{
+    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+}
+
+<a class="list-group-item @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">
+    <i class="fas fa-user me-2"></i>Thông tin cá nhân
+</a>
+<a class="list-group-item @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">
+    <i class="fas fa-envelope me-2"></i>Email
+</a>
+<a class="list-group-item @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">
+    <i class="fas fa-key me-2"></i>Mật khẩu
+</a>
+@if (hasExternalLogins)
+{
+    <a class="list-group-item @ManageNavPages.ExternalLoginsNavClass(ViewContext)" id="external-logins" asp-page="./ExternalLogins">
+        <i class="fas fa-external-link-alt me-2"></i>Đăng nhập ngoài
+    </a>
+}
+<a class="list-group-item @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">
+    <i class="fas fa-shield-alt me-2"></i>Xác thực 2 yếu tố
+</a>
+<a class="list-group-item @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">
+    <i class="fas fa-database me-2"></i>Dữ liệu cá nhân
+</a>

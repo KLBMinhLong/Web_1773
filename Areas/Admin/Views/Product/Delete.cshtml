@@ -1,11 +1,31 @@
-@model Web_1773.Models.Product
-
 @{
     ViewData["Title"] = "Xóa sản phẩm";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid py-4">
+<!-- Loading State -->
+<div id="loadingState" class="container-fluid py-4">
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Đang tải...</span>
+        </div>
+        <p class="mt-2">Đang tải thông tin sản phẩm...</p>
+    </div>
+</div>
+
+<!-- Error State -->
+<div id="errorState" class="container-fluid py-4 d-none">
+    <div class="alert alert-danger">
+        <h4>Lỗi!</h4>
+        <p id="errorMessage">Không thể tải thông tin sản phẩm.</p>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+<!-- Delete Form Content -->
+<div id="deleteContent" class="container-fluid py-4 d-none">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <div>
             <nav aria-label="breadcrumb">
@@ -38,35 +58,26 @@
 
                     <div class="product-info p-3 mb-4 bg-light rounded-3">
                         <div class="d-flex align-items-center">
-                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                            {
-                                <img src="@Model.ImageUrl" alt="@Model.Name" class="product-thumbnail me-3" />
-                            }
-                            else
-                            {
-                                <i class="fas fa-box fa-2x text-primary me-3"></i>
-                            }
+                            <img id="productImage" class="product-thumbnail me-3" style="display: none;" />
+                            <i id="productIcon" class="fas fa-box fa-2x text-primary me-3"></i>
                             <div>
-                                <h6 class="mb-1 fw-bold">@Model.Name</h6>
+                                <h6 id="productName" class="mb-1 fw-bold"></h6>
                                 <div class="d-flex align-items-center">
-                                    <span class="badge bg-primary me-2">ID: @Model.Id</span>
-                                    <span class="badge bg-success">@String.Format("{0:N0} ₫", Model.Price)</span>
+                                    <span id="productId" class="badge bg-primary me-2"></span>
+                                    <span id="productPrice" class="badge bg-success"></span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <form asp-action="Delete" method="post">
-                        <input type="hidden" asp-for="Id" />
-                        <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                            <a asp-action="Index" class="btn btn-secondary px-4 py-2">
-                                <i class="fas fa-arrow-left me-2"></i>Hủy và quay lại
-                            </a>
-                            <button type="submit" class="btn btn-danger px-4 py-2">
-                                <i class="fas fa-trash-alt me-2"></i>Xác nhận xóa
-                            </button>
-                        </div>
-                    </form>
+                    <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-secondary px-4 py-2">
+                            <i class="fas fa-arrow-left me-2"></i>Hủy và quay lại
+                        </a>
+                        <button type="button" id="confirmDeleteBtn" class="btn btn-danger px-4 py-2">
+                            <i class="fas fa-trash-alt me-2"></i>Xác nhận xóa
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -165,8 +176,123 @@
     .text-primary {
         color: #667eea !important;
     }
-    
-    .text-danger {
+      .text-danger {
         color: #dc3545 !important;
     }
 </style>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get product ID from URL
+            const pathSegments = window.location.pathname.split('/');
+            const productId = pathSegments[pathSegments.length - 1];
+            
+            if (!productId || isNaN(productId)) {
+                showError('ID sản phẩm không hợp lệ');
+                return;
+            }
+            
+            loadProduct(productId);
+            
+            // Confirm delete button event
+            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                deleteProduct(productId);
+            });
+        });
+        
+        function loadProduct(productId) {
+            fetch(`/api/products/${productId}`)
+                .then(async response => {
+                    if (!response.ok) {
+                        throw new Error(`Lỗi ${response.status}: ${response.statusText}`);
+                    }
+                    return await response.json();
+                })
+                .then(product => {
+                    displayProduct(product);
+                    hideLoading();
+                    showDeleteForm();
+                })
+                .catch(error => {
+                    console.error('Error loading product:', error);
+                    showError(`Không thể tải thông tin sản phẩm: ${error.message}`);
+                    hideLoading();
+                });
+        }
+        
+        function displayProduct(product) {
+            // Update product name and title
+            document.getElementById('productName').textContent = product.name;
+            document.title = `Xóa sản phẩm - ${product.name}`;
+            
+            // Update product ID and price
+            document.getElementById('productId').textContent = `ID: ${product.id}`;
+            document.getElementById('productPrice').textContent = formatPrice(product.price);
+            
+            // Update product image
+            const productImage = document.getElementById('productImage');
+            const productIcon = document.getElementById('productIcon');
+            
+            if (product.imageUrl) {
+                productImage.src = product.imageUrl;
+                productImage.alt = product.name;
+                productImage.style.display = 'block';
+                productIcon.style.display = 'none';
+            } else {
+                productImage.style.display = 'none';
+                productIcon.style.display = 'block';
+            }
+        }
+        
+        function deleteProduct(productId) {
+            // Show loading state on delete button
+            const deleteBtn = document.getElementById('confirmDeleteBtn');
+            const originalText = deleteBtn.innerHTML;
+            deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xóa...';
+            deleteBtn.disabled = true;
+            
+            fetch(`/api/products/${productId}`, {
+                method: 'DELETE'
+            })
+            .then(async response => {
+                if (response.ok) {
+                    // Success - redirect to product list with success message
+                    sessionStorage.setItem('deleteSuccess', 'Sản phẩm đã được xóa thành công!');
+                    window.location.href = '/Admin/Product';
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Lỗi ${response.status}: ${response.statusText}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting product:', error);
+                alert(`Không thể xóa sản phẩm: ${error.message}`);
+                
+                // Restore delete button
+                deleteBtn.innerHTML = originalText;
+                deleteBtn.disabled = false;
+            });
+        }
+        
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(price);
+        }
+        
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorState').classList.remove('d-none');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingState').classList.add('d-none');
+        }
+        
+        function showDeleteForm() {
+            document.getElementById('deleteContent').classList.remove('d-none');
+        }
+    </script>
+}

@@ -29,7 +29,7 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Update" method="post" enctype="multipart/form-data">
+                    <form id="updateProductForm" enctype="multipart/form-data">
                         <input type="hidden" asp-for="Id" />
                         
                         <div class="row">
@@ -38,7 +38,7 @@
                                 <div class="mb-4">
                                     <label asp-for="Name" class="form-label fw-medium">Tên sản phẩm</label>
                                     <input asp-for="Name" class="form-control form-control-lg rounded-3" placeholder="Nhập tên sản phẩm" />
-                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                    <span id="NameError" class="text-danger"></span>
                                 </div>
 
                                 <div class="mb-4">
@@ -47,7 +47,7 @@
                                         <input asp-for="Price" class="form-control form-control-lg rounded-start" placeholder="0" />
                                         <span class="input-group-text rounded-end">VNĐ</span>
                                     </div>
-                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                    <span id="PriceError" class="text-danger"></span>
                                 </div>
 
                                 <div class="mb-4">
@@ -55,13 +55,13 @@
                                     <select asp-for="CategoryId" class="form-select form-select-lg" asp-items="ViewBag.Categories">
                                         <option value="">-- Chọn danh mục --</option>
                                     </select>
-                                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                    <span id="CategoryIdError" class="text-danger"></span>
                                 </div>
 
                                 <div class="mb-4">
                                     <label asp-for="Description" class="form-label fw-medium">Mô tả sản phẩm</label>
                                     <textarea asp-for="Description" class="form-control" rows="5" placeholder="Nhập mô tả chi tiết về sản phẩm..."></textarea>
-                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                    <span id="DescriptionError" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -108,6 +108,8 @@
                             </button>
                         </div>
                     </form>
+                    <div id="updateProductSuccess" class="alert alert-success mt-3 d-none">Cập nhật sản phẩm thành công!</div>
+                    <div id="updateProductError" class="alert alert-danger mt-3 d-none"></div>
                 </div>
             </div>
         </div>
@@ -192,22 +194,90 @@
 
 @section Scripts {
     <script>
-        // Image preview functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const imageInput = document.querySelector('input[name="ImageFile"]');
-            const imagePreview = document.querySelector('.product-preview');
-            
-            if (imageInput && imagePreview) {
-                imageInput.addEventListener('change', function() {
-                    if (this.files && this.files[0]) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            imagePreview.src = e.target.result;
-                        };
-                        reader.readAsDataURL(this.files[0]);
-                    }
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('updateProductForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const form = e.target;
+                const formData = new FormData();
+                
+                // Clear previous messages and errors
+                document.getElementById('updateProductSuccess').classList.add('d-none');
+                document.getElementById('updateProductError').classList.add('d-none');
+                
+                // Clear all validation errors
+                const errorFields = ['Name', 'Price', 'CategoryId', 'Description'];
+                errorFields.forEach(field => {
+                    const errSpan = document.getElementById(field + 'Error');
+                    if (errSpan) errSpan.innerText = '';
                 });
-            }
+
+                // Get form fields
+                const nameField = form.querySelector('[name="Name"]');
+                const priceField = form.querySelector('[name="Price"]');
+                const categoryField = form.querySelector('[name="CategoryId"]');
+                const descriptionField = form.querySelector('[name="Description"]');
+                const imageField = form.querySelector('[name="ImageFile"]');
+                const idField = form.querySelector('[name="Id"]');
+
+                // Add form data
+                if (nameField) formData.append('Name', nameField.value || '');
+                if (priceField) formData.append('Price', priceField.value || '0');
+                if (categoryField) formData.append('CategoryId', categoryField.value || '0');
+                if (descriptionField) formData.append('Description', descriptionField.value || '');
+                
+                // Handle image file
+                if (imageField && imageField.files && imageField.files.length > 0 && imageField.files[0].size > 0) {
+                    formData.append('ImageFile', imageField.files[0]);
+                }
+                
+                const id = idField ? idField.value : '';
+                
+                fetch(`/api/products/${id}`, {
+                    method: 'PUT',
+                    body: formData
+                }).then(async res => {
+                    if (res.ok) {
+                        document.getElementById('updateProductSuccess').classList.remove('d-none');
+                        document.getElementById('updateProductSuccess').innerText = 'Cập nhật sản phẩm thành công!';
+                    } else if (res.status === 400) {
+                        const contentType = res.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            const data = await res.json();
+                            
+                            if (data.errors) {
+                                // Handle validation errors
+                                Object.keys(data.errors).forEach(key => {
+                                    const errorMessages = data.errors[key];
+                                    const errSpan = document.getElementById(key + 'Error');
+                                    if (errSpan) {
+                                        errSpan.innerText = Array.isArray(errorMessages) 
+                                            ? errorMessages.join(', ') 
+                                            : errorMessages;
+                                    }
+                                });
+                            } else if (data.error) {
+                                document.getElementById('updateProductError').innerText = data.error;
+                                document.getElementById('updateProductError').classList.remove('d-none');
+                            } else {
+                                document.getElementById('updateProductError').innerText = 'Lỗi dữ liệu không xác định!';
+                                document.getElementById('updateProductError').classList.remove('d-none');
+                            }
+                        } else {
+                            const text = await res.text();
+                            document.getElementById('updateProductError').innerText = 'Lỗi máy chủ: ' + text;
+                            document.getElementById('updateProductError').classList.remove('d-none');
+                        }
+                    } else {
+                        document.getElementById('updateProductError').innerText = `Lỗi máy chủ (${res.status}): ${res.statusText}`;
+                        document.getElementById('updateProductError').classList.remove('d-none');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Fetch error:', error);
+                    document.getElementById('updateProductError').innerText = 'Không thể kết nối API!';
+                    document.getElementById('updateProductError').classList.remove('d-none');
+                });
+            });
         });
     </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

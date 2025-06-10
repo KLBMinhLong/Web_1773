@@ -66,17 +66,12 @@ namespace Web_1773.Areas.Admin.Controllers
             var categories = await _categoryRepository.GetAllAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name");
             return View(product);
-        }
-
-        // Hiển thị thông tin chi tiết sản phẩm 
-        public async Task<IActionResult> Display(int id)
+        }        // Hiển thị thông tin chi tiết sản phẩm 
+        public IActionResult Display(int id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            return View(product);
+            // Just return the view - product data will be loaded via API
+            ViewBag.ProductId = id;
+            return View();
         }
 
         // Hiển thị form cập nhật sản phẩm 
@@ -108,18 +103,13 @@ namespace Web_1773.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
-        }
-
-        // Hiển thị form xác nhận xóa sản phẩm 
-        public async Task<IActionResult> Delete(int id)
+        }        // Hiển thị form xác nhận xóa sản phẩm 
+        public IActionResult Delete(int id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            return View(product);
-        }        // Xử lý xóa sản phẩm 
+            // Just return the view - product data will be loaded via API
+            ViewBag.ProductId = id;
+            return View();
+        }// Xử lý xóa sản phẩm 
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

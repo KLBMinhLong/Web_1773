@@ -1,9 +1,31 @@
-@model Web_1773.Models.Product
-
 @{
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Chi tiết sản phẩm";
 }
-<div class="container py-4">
+
+<!-- Loading State -->
+<div id="loadingState" class="container py-4">
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Đang tải...</span>
+        </div>
+        <p class="mt-2">Đang tải thông tin sản phẩm...</p>
+    </div>
+</div>
+
+<!-- Error State -->
+<div id="errorState" class="container py-4 d-none">
+    <div class="alert alert-danger">
+        <h4>Lỗi!</h4>
+        <p id="errorMessage">Không thể tải thông tin sản phẩm.</p>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+<!-- Product Content -->
+<div id="productContent" class="container py-4 d-none">
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             <div class="row g-0">
@@ -12,38 +34,18 @@
                     <div class="product-gallery p-4">
                         <!-- Main Product Image -->
                         <div class="main-image-container mb-3">
-                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                            {
-                                <img src="@Model.ImageUrl" class="img-fluid main-product-image rounded" 
-                                     alt="@Model.Name" 
-                                     onerror="this.src='/images/product-placeholder.jpg'">
-                            }
-                            else
-                            {
-                                <img src="/images/product-placeholder.jpg" class="img-fluid main-product-image rounded" 
-                                     alt="Product placeholder">
-                            }
+                            <img id="mainProductImage" class="img-fluid main-product-image rounded" 
+                                 alt="Product image" 
+                                 onerror="this.src='/images/product-placeholder.jpg'">
                         </div>
 
                         <!-- Additional Images Gallery -->
-                        @if (Model.ImageUrls != null && Model.ImageUrls.Any())
-                        {
-                            <div class="additional-images">
-                                <h6 class="text-muted mb-2">Ảnh bổ sung</h6>
-                                <div class="row g-2">
-                                    @foreach (var imageUrl in Model.ImageUrls)
-                                    {
-                                        <div class="col-3">
-                                            <div class="thumbnail-container">
-                                                <img src="@imageUrl" class="img-thumbnail additional-image" 
-                                                     alt="Additional product image"
-                                                     onerror="this.src='/images/product-placeholder.jpg'">
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
+                        <div id="additionalImagesContainer" class="additional-images d-none">
+                            <h6 class="text-muted mb-2">Ảnh bổ sung</h6>
+                            <div id="additionalImagesGrid" class="row g-2">
+                                <!-- Additional images will be populated here -->
                             </div>
-                        }
+                        </div>
                     </div>
                 </div>
                 
@@ -51,32 +53,54 @@
                 <div class="col-lg-6">
                     <div class="product-details p-4">
                         <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h2 class="display-6 fw-bold mb-1">@Model.Name</h2>
-                            <span class="badge bg-primary rounded-pill">@Model.Category?.Name</span>
+                            <h2 id="productName" class="display-6 fw-bold mb-1"></h2>
+                            <span id="categoryBadge" class="badge bg-primary rounded-pill"></span>
                         </div>
                         
                         <div class="mb-4">
-                            <span class="product-price display-6 text-primary fw-bold">
-                                @String.Format("{0:N0} ₫", Model.Price)
-                            </span>
+                            <span id="productPrice" class="product-price display-6 text-primary fw-bold"></span>
                         </div>
                         
                         <div class="product-description mb-4">
                             <h5>Mô tả sản phẩm</h5>
                             <hr>
-                            <p>@Model.Description</p>
+                            <p id="productDescription"></p>
                         </div>
                         
                         <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                            <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-warning btn-lg px-4 me-md-2">
+                            <a id="editButton" class="btn btn-warning btn-lg px-4 me-md-2">
                                 <i class="fas fa-edit me-2"></i> Chỉnh sửa
                             </a>
+                            <button id="deleteButton" class="btn btn-danger btn-lg px-4 me-md-2">
+                                <i class="fas fa-trash me-2"></i> Xóa
+                            </button>
                             <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
                                 <i class="fas fa-arrow-left me-2"></i> Quay lại
                             </a>
                         </div>
                     </div>
                 </div>
+            </div>        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa sản phẩm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa sản phẩm <strong id="deleteProductName"></strong> không?</p>
+                <p class="text-muted">Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" id="confirmDeleteBtn" class="btn btn-danger">
+                    <i class="fas fa-trash me-2"></i>Xóa sản phẩm
+                </button>
             </div>
         </div>
     </div>
@@ -130,8 +154,7 @@
     .product-price {
         color: #007bff;
     }
-    
-    @@media (max-width: 992px) {
+      @@media (max-width: 992px) {
         .main-image-container {
             height: 300px;
         }
@@ -143,3 +166,170 @@
         }
     }
 </style>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get product ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const pathSegments = window.location.pathname.split('/');
+            const productId = pathSegments[pathSegments.length - 1];
+            
+            if (!productId || isNaN(productId)) {
+                showError('ID sản phẩm không hợp lệ');
+                return;
+            }
+            
+            loadProduct(productId);
+            
+            // Delete button event
+            document.getElementById('deleteButton').addEventListener('click', function() {
+                showDeleteModal();
+            });
+            
+            // Confirm delete button event
+            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                deleteProduct(productId);
+            });
+        });
+        
+        function loadProduct(productId) {
+            fetch(`/api/products/${productId}`)
+                .then(async response => {
+                    if (!response.ok) {
+                        throw new Error(`Lỗi ${response.status}: ${response.statusText}`);
+                    }
+                    return await response.json();
+                })
+                .then(product => {
+                    displayProduct(product);
+                    hideLoading();
+                    showProduct();
+                })
+                .catch(error => {
+                    console.error('Error loading product:', error);
+                    showError(`Không thể tải thông tin sản phẩm: ${error.message}`);
+                    hideLoading();
+                });
+        }
+        
+        function displayProduct(product) {
+            // Update product name and title
+            document.getElementById('productName').textContent = product.name;
+            document.title = `Chi tiết sản phẩm - ${product.name}`;
+            
+            // Update category
+            const categoryBadge = document.getElementById('categoryBadge');
+            categoryBadge.textContent = product.categoryName || 'Không có danh mục';
+            
+            // Update price
+            const priceElement = document.getElementById('productPrice');
+            priceElement.textContent = formatPrice(product.price);
+            
+            // Update description
+            const descElement = document.getElementById('productDescription');
+            descElement.textContent = product.description || 'Không có mô tả';
+            
+            // Update main image
+            const mainImage = document.getElementById('mainProductImage');
+            if (product.imageUrl) {
+                mainImage.src = product.imageUrl;
+                mainImage.alt = product.name;
+            } else {
+                mainImage.src = '/images/product-placeholder.jpg';
+                mainImage.alt = 'Product placeholder';
+            }
+            
+            // Update edit button
+            const editButton = document.getElementById('editButton');
+            editButton.href = `/Admin/Product/Update/${product.id}`;
+            
+            // Handle additional images (if implemented in future)
+            if (product.imageUrls && product.imageUrls.length > 0) {
+                displayAdditionalImages(product.imageUrls);
+            }
+        }
+        
+        function displayAdditionalImages(imageUrls) {
+            const container = document.getElementById('additionalImagesContainer');
+            const grid = document.getElementById('additionalImagesGrid');
+            
+            imageUrls.forEach(imageUrl => {
+                const colDiv = document.createElement('div');
+                colDiv.className = 'col-3';
+                
+                const thumbnailDiv = document.createElement('div');
+                thumbnailDiv.className = 'thumbnail-container';
+                
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.className = 'img-thumbnail additional-image';
+                img.alt = 'Additional product image';
+                img.onerror = function() { this.src = '/images/product-placeholder.jpg'; };
+                
+                thumbnailDiv.appendChild(img);
+                colDiv.appendChild(thumbnailDiv);
+                grid.appendChild(colDiv);
+            });
+            
+            container.classList.remove('d-none');
+        }
+        
+        function showDeleteModal() {
+            const productName = document.getElementById('productName').textContent;
+            document.getElementById('deleteProductName').textContent = productName;
+            
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
+        }
+        
+        function deleteProduct(productId) {
+            // Show loading state on delete button
+            const deleteBtn = document.getElementById('confirmDeleteBtn');
+            const originalText = deleteBtn.innerHTML;
+            deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xóa...';
+            deleteBtn.disabled = true;
+            
+            fetch(`/api/products/${productId}`, {
+                method: 'DELETE'
+            })
+            .then(async response => {
+                if (response.ok) {
+                    // Success - redirect to product list
+                    window.location.href = '/Admin/Product';
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Lỗi ${response.status}: ${response.statusText}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting product:', error);
+                alert(`Không thể xóa sản phẩm: ${error.message}`);
+                
+                // Restore delete button
+                deleteBtn.innerHTML = originalText;
+                deleteBtn.disabled = false;
+            });
+        }
+        
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(price);
+        }
+        
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorState').classList.remove('d-none');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingState').classList.add('d-none');
+        }
+        
+        function showProduct() {
+            document.getElementById('productContent').classList.remove('d-none');
+        }
+    </script>
+}

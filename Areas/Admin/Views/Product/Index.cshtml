@@ -1,5 +1,3 @@
-@model IEnumerable<Web_1773.Models.Product>
-
 @{
     ViewData["Title"] = "Quản lý sản phẩm";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
@@ -12,62 +10,64 @@
         </a>
     </div>
 
-    <div class="row g-4">
-        @foreach (var product in Model)
-        {
-            <div class="col-xl-3 col-lg-4 col-md-6">
-                <div class="card product-card h-100">
-                    <div class="product-image-wrapper">
-                        @if (!string.IsNullOrEmpty(product.ImageUrl))
-                        {
-                            <img src="@product.ImageUrl" class="card-img-top product-image" 
-                                 alt="@product.Name" 
-                                 onerror="this.src='/images/product-placeholder.jpg'">
-                        }
-                        else
-                        {
-                            <img src="/images/product-placeholder.jpg" class="card-img-top product-image" alt="Product image placeholder">
-                        }
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title product-title mb-0">@product.Name</h5>
-                            <span class="badge bg-info rounded-pill">ID: @product.Id</span>
-                        </div>
-                        
-                        <p class="card-text small text-muted mb-2">
-                            <i class="fas fa-tag me-1"></i> @(product.Category != null ? product.Category.Name : "No Category")
-                        </p>
-                        
-                        <p class="card-text small mb-2">
-                            <span class="fw-bold">Giá:</span> @(String.Format("{0:N0} ₫", product.Price))
-                        </p>
-                        
-                        <p class="card-text flex-grow-1 product-description">
-                            @(product.Description?.Length > 60 
-                                ? product.Description.Substring(0, 60) + "..." 
-                                : product.Description)
-                        </p>
-                        
-                        <div class="mt-auto d-flex justify-content-between">
-                            <div class="btn-group w-100">
-                                <a class="btn btn-sm btn-outline-info" asp-action="Display" asp-route-id="@product.Id">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a class="btn btn-sm btn-outline-warning" asp-action="Update" asp-route-id="@product.Id">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@product.Id">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
+    <div class="row g-4" id="product-list">
+        <!-- Sản phẩm sẽ được render ở đây -->
     </div>
 </div>
+
+@section Scripts {
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/api/products')
+            .then(res => res.json())
+            .then(products => {
+                const container = document.getElementById('product-list');
+                container.innerHTML = '';
+                products.forEach(product => {
+                    container.innerHTML += `
+                    <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="card product-card h-100">
+                            <div class="product-image-wrapper">
+                                <img src="${product.imageUrl ? product.imageUrl : '/images/product-placeholder.jpg'}" 
+                                     class="card-img-top product-image"
+                                     alt="${product.name}" 
+                                     ${product.imageUrl ? "onerror=\"this.src='/images/product-placeholder.jpg'\"" : ""}>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title product-title mb-0">${product.name}</h5>
+                                    <span class="badge bg-info rounded-pill">ID: ${product.id}</span>
+                                </div>
+                                <p class="card-text small text-muted mb-2">
+                                    <i class="fas fa-tag me-1"></i> ${product.categoryName || 'No Category'}
+                                </p>
+                                <p class="card-text small mb-2">
+                                    <span class="fw-bold">Giá:</span> ${product.price.toLocaleString()} ₫
+                                </p>
+                                <p class="card-text flex-grow-1 product-description">
+                                    ${product.description && product.description.length > 60 ? product.description.substring(0, 60) + "..." : (product.description || "")}
+                                </p>
+                                <div class="mt-auto d-flex justify-content-between">
+                                    <div class="btn-group w-100">
+                                        <a class="btn btn-sm btn-outline-info" href="/Admin/Product/Display/${product.id}">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a class="btn btn-sm btn-outline-warning" href="/Admin/Product/Update/${product.id}">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a class="btn btn-sm btn-outline-danger" href="/Admin/Product/Delete/${product.id}">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+            });
+    });
+</script>
+}
 
 <style>
 .product-card {

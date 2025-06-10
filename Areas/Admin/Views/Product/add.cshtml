@@ -30,31 +30,29 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Add" method="post" enctype="multipart/form-data">
+                    <form id="addProductForm" enctype="multipart/form-data">
                         <div class="row">
                             <div class="col-md-6">
                                 <!-- Thông tin cơ bản -->
                                 <div class="mb-4">
-                                    <label asp-for="Name" class="form-label fw-medium">Tên sản phẩm</label>
-                                    <input asp-for="Name" class="form-control form-control-lg rounded-3" placeholder="Nhập tên sản phẩm" />
-                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                    <label for="Name" class="form-label fw-medium">Tên sản phẩm</label>
+                                    <input id="Name" name="Name" class="form-control form-control-lg rounded-3" placeholder="Nhập tên sản phẩm" required />
+                                    <span class="text-danger" id="NameError"></span>
                                 </div>
 
                                 <div class="mb-4">
-                                    <label asp-for="Price" class="form-label fw-medium">Giá sản phẩm</label>
+                                    <label for="Price" class="form-label fw-medium">Giá sản phẩm</label>
                                     <div class="input-group">
-                                        <input asp-for="Price" class="form-control form-control-lg rounded-start" placeholder="0" />
+                                        <input id="Price" name="Price" type="number" step="0.01" class="form-control form-control-lg rounded-start" placeholder="0" required />
                                         <span class="input-group-text rounded-end">VNĐ</span>
                                     </div>
-                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                    <span class="text-danger" id="PriceError"></span>
                                 </div>
 
                                 <div class="mb-4">
-                                    <label asp-for="CategoryId" class="form-label fw-medium">Danh mục</label>
-                                    <select asp-for="CategoryId" class="form-select form-select-lg" asp-items="ViewBag.Categories">
-                                        <option value="">-- Chọn danh mục --</option>
-                                    </select>
-                                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                    <label for="CategoryId" class="form-label fw-medium">Danh mục</label>
+                                    <select id="CategoryId" name="CategoryId" class="form-select form-select-lg" required></select>
+                                    <span class="text-danger" id="CategoryIdError"></span>
                                 </div>
                             </div>
 
@@ -64,25 +62,26 @@
                                     <label class="form-label fw-medium">Ảnh đại diện</label>
                                     <div class="input-group mb-2">
                                         <span class="input-group-text"><i class="fas fa-image"></i></span>
-                                        <input type="file" name="mainImage" class="form-control form-control-lg" accept="image/*" />
+                                        <input type="file" id="mainImage" name="mainImage" class="form-control form-control-lg" accept="image/*" />
                                     </div>
                                     <small class="text-muted">Chọn một ảnh đại diện cho sản phẩm</small>
+                                    <span class="text-danger" id="mainImageError"></span>
                                 </div>
 
                                 <div class="mb-4">
                                     <label class="form-label fw-medium">Ảnh bổ sung</label>
                                     <div class="input-group mb-2">
                                         <span class="input-group-text"><i class="fas fa-images"></i></span>
-                                        <input type="file" name="additionalImages" multiple class="form-control form-control-lg" accept="image/*" />
+                                        <input type="file" id="additionalImages" name="additionalImages" multiple class="form-control form-control-lg" accept="image/*" />
                                     </div>
                                     <small class="text-muted">Có thể chọn nhiều ảnh (nhấn giữ CTRL để chọn)</small>
                                 </div>
                             </div>
 
                             <div class="col-12 mb-4">
-                                <label asp-for="Description" class="form-label fw-medium">Mô tả sản phẩm</label>
-                                <textarea asp-for="Description" class="form-control" rows="5" placeholder="Nhập mô tả chi tiết về sản phẩm..."></textarea>
-                                <span asp-validation-for="Description" class="text-danger"></span>
+                                <label for="Description" class="form-label fw-medium">Mô tả sản phẩm</label>
+                                <textarea id="Description" name="Description" class="form-control" rows="5" placeholder="Nhập mô tả chi tiết về sản phẩm..."></textarea>
+                                <span class="text-danger" id="DescriptionError"></span>
                             </div>
                         </div>
 
@@ -95,6 +94,8 @@
                             </button>
                         </div>
                     </form>
+                    <div id="addProductSuccess" class="alert alert-success mt-3 d-none">Thêm sản phẩm thành công!</div>
+                    <div id="addProductError" class="alert alert-danger mt-3 d-none"></div>
                 </div>
             </div>
         </div>
@@ -160,9 +161,61 @@
 
 @section Scripts {
     <script>
-        // Image preview functionality could be added here
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add any client-side validation or enhancements here
+        document.addEventListener('DOMContentLoaded', function () {
+            // Load categories for select
+            fetch('/api/categories')
+                .then(res => res.json())
+                .then(categories => {
+                    const select = document.getElementById('CategoryId');
+                    select.innerHTML = '<option value="">-- Chọn danh mục --</option>';
+                    categories.forEach(cat => {
+                        select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+                    });
+                });
+
+            // Handle form submit
+            document.getElementById('addProductForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const form = e.target;
+                const formData = new FormData(form);
+                // Xóa thông báo lỗi cũ
+                document.getElementById('addProductSuccess').classList.add('d-none');
+                document.getElementById('addProductError').classList.add('d-none');
+                ['Name','Price','CategoryId','Description','mainImage'].forEach(f => {
+                    document.getElementById(f+'Error').innerText = '';
+                });
+                // Trước khi gửi formData:
+                formData.set('CategoryId', parseInt(formData.get('CategoryId') || 0));
+                formData.set('Price', parseFloat(formData.get('Price') || 0));
+                fetch('/api/products', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(async res => {
+                    if (res.ok) {
+                        document.getElementById('addProductSuccess').classList.remove('d-none');
+                        form.reset();
+                    } else if (res.status === 400) {
+                        const data = await res.json();
+                        if (data.errors) {
+                            Object.keys(data.errors).forEach(key => {
+                                const errSpan = document.getElementById(key+'Error');
+                                if (errSpan) errSpan.innerText = data.errors[key].join(', ');
+                            });
+                        } else {
+                            document.getElementById('addProductError').innerText = 'Lỗi dữ liệu!';
+                            document.getElementById('addProductError').classList.remove('d-none');
+                        }
+                    } else {
+                        document.getElementById('addProductError').innerText = 'Có lỗi xảy ra!';
+                        document.getElementById('addProductError').classList.remove('d-none');
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('addProductError').innerText = 'Không thể kết nối API!';
+                    document.getElementById('addProductError').classList.remove('d-none');
+                });
+            });
         });
     </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

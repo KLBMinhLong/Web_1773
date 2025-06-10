@@ -47,6 +47,8 @@ app.UseRouting();
 app.UseAuthentication(); 
 app.UseAuthorization();
 
+app.MapControllers();
+
 // Seed the admin user and role
 using (var scope = app.Services.CreateScope())
 {
